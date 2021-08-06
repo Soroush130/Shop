@@ -1,0 +1,121 @@
+{% extends 'account/base_profile/base.html' %}
+{% load static %}
+
+{% block profile %}
+    <div class="content-wrapper" style="min-height: 1015.12px;">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Todo List</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item active">ToDo Form</li>
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Todo Form</h3>
+                            </div>
+                            <form action="" method="POST" role="form">
+                                {% csrf_token %}
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="Input-todo">To Do</label>
+                                        <input type="text" name="text" class="form-control" id="Input-todo"
+                                               placeholder="Enter text">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="InputTime">Time</label>
+                                        <input type="time" name="time" class="form-control" id="InputTime"
+                                               placeholder="time">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="InputDate">Date</label>
+                                        <input type="date" name="date" class="form-control" id="InputDate"
+                                               placeholder="date">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Todo-list Table</h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 10px">#</th>
+                                        <th>Text</th>
+                                        <th>Time</th>
+                                        <th style="width: 40px"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for t in page_obj %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ t.text }}</td>
+                                            <td>
+                                                time : {{ t.time }} -- date : {{ t.date }}
+                                            </td>
+                                            <td><a href="/todo/remove-todo/{{ t.id }}"><i class="nav-icon fas fa-trash-alt" style="color: red"></i></a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer clearfix">
+                                <ul class="pagination pagination-sm m-0 float-right">
+
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item"><a class="page-link"
+                                                                 href="?page={{ page_obj.previous_page_number }}">«</a>
+                                        </li>
+                                    {% endif %}
+
+                                    {% for num in page_obj.paginator.page_range %}
+                                        {% ifequal num page_obj.number %}
+                                            <li class="page-item active"><a class="page-link"
+                                                                     href="?page={{ num }}">{{ num }}</a></li>
+                                        {% else %}
+                                            <li class="page-item"><a class="page-link"
+                                                                     href="?page={{ num }}">{{ num }}</a></li>
+                                        {% endifequal %}
+                                    {% endfor %}
+
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item"><a class="page-link"
+                                                                 href="?page={{ page_obj.next_page_number }}">»</a></li>
+                                    {% endif %}
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

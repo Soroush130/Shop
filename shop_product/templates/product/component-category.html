@@ -1,0 +1,80 @@
+{% load static %}
+<div class="col-sm-3">
+    <div class="left-sidebar">
+        <h2>دسته بندی محصولات</h2>
+        <div class="panel-group category-products" id="accordian"><!--category-productsr-->
+            {% for category in categories %}
+                {% if category.parent == None and category.childern.all %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordian"
+                                   href="#{{ category.id }}">
+                                    <span class="badge pull-right"><i class="fa fa-plus"></i></span>
+                                    {{ category.title }}
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="{{ category.id }}" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <ul>
+                                    {% for cat in category.childern.all %}
+                                        <li>
+                                            <a href="/products/category_product/{{ cat.slug }}">{{ cat.title }} </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% elif category.parent == None %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title"><a
+                                    href="/products/category_product/{{ category.slug }}">{{ category.title }}</a>
+                            </h4>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+        </div><!--/category-productsr-->
+
+        <div class="brands_products"><!--brands_products-->
+            <h2>برنـد ها</h2>
+            <div class="brands-name">
+                <ul class="nav nav-pills nav-stacked">
+                    {% for brand in brands %}
+
+                        <li><a href="/products/brand_category_product/{{ brand.slug }}"> <span
+                                class="pull-left">({{ brand.brand_product.count }})</span>برنـد {{ brand.title }}</a>
+                        </li>
+
+                    {% endfor %}
+                </ul>
+            </div>
+        </div><!--/brands_products-->
+
+        <div class="price-range"><!--price-range-->
+            <h2>فیلتـر قیمـت</h2>
+            <div class="well">
+                <form action="/products/filter_price" method="get">
+                    <div class="input-group">
+                        <label for="min">حداقل قیمت :</label>
+                        <input type="number" class="form-control" id="min" name="min_price" value="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="mac">حداکثر قیمت :</label>
+                        <input type="number" class="form-control" id="mac" name="max_price" value="0">
+                    </div>
+                    <button type="submit" style="background-color: orange; color: white;margin: 8px 35%">جستجو</button>
+                </form>
+            </div>
+        </div><!--/price-range-->
+
+        <div class="shipping text-center"><!--shipping-->
+            <img src="{% static 'images/home/shipping.jpg' %}" alt="">
+        </div><!--/shipping-->
+
+    </div>
+</div>

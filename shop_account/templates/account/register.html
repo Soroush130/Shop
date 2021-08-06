@@ -1,0 +1,27 @@
+{% extends 'shared/_MainLayout.html' %}
+{% load static %}
+
+{% block title %}
+ثبت نام
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <section id="form"><!--form-->
+            <div class="row">
+                <div class="col-sm-4 col-sm-offset-1">
+                    <div class="signup-form"><!--sign up form-->
+                        <h2>ثبت نام کاربـر جدیـد</h2>
+                        <form action="/account/register" method="POST">
+                            {% csrf_token %}
+                            <input type="email" name="email" placeholder="آدرس ایمیـل">
+                            <input type="text" name="name" placeholder="نام کاربـری">
+                            <input type="password" name="password" placeholder="رمـز عبـور">
+                            <input type="password" name="re_password" placeholder="تکرار رمـز عبـور">
+                            <button type="submit" class="btn btn-default">ثبت نام</button>
+                        </form>
+                    </div><!--/sign up form-->
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

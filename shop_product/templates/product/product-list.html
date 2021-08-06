@@ -1,0 +1,86 @@
+{% extends 'shared/_MainLayout.html' %}
+{% load static %}
+
+{% block title %}
+محصولات
+{% endblock %}
+
+{% block content %}
+
+    <section id="advertisement">
+        <div class="container">
+            <img src="{% static 'images/shop/advertisement.jpg' %}" alt="">
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="row">
+
+                <div class="col-sm-9 padding-right">
+                    <div class="features_items"><!--features_items-->
+                        <h2 class="title text-center">محصولات عمده</h2>
+                        {% for product in page_obj %}
+                            <div class="col-sm-4">
+                                <div class="product-image-wrapper">
+                                    <div class="single-products">
+                                        <div class="productinfo text-center">
+                                            {% if product.image %}
+                                                <img src="{{ product.image.url }}" alt="">
+                                            {% else %}
+                                                <img src="{% static 'images/shop/product.jpg' %}" alt="">
+                                            {% endif %}
+                                            <h2>{{ product.price }} ريال</h2>
+                                            <p>{{ product.title }}</p>
+                                            <a href="#" class="btn btn-default add-to-cart"><i
+                                                    class="fa fa-shopping-cart"></i>افزودن به سبـد خریـد</a>
+                                        </div>
+                                        <div class="product-overlay">
+                                            <div class="overlay-content">
+                                                <h2>{{ product.price }} ريال</h2>
+                                                <p>{{ product.title }}</p>
+                                                <a href="#" class="btn btn-default add-to-cart"><i
+                                                        class="fa fa-shopping-cart"></i>افزودن به سبـد خریـد</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="choose">
+                                        <ul class="nav nav-pills nav-justified">
+                                            <li><a href="/account/favourite-list"><i class="fa fa-plus-square"></i>لیست علاقه مندی ها</a></li>
+                                            <li><a href="/products/product_detail/{{ product.id }}"><i
+                                                    class="fa fa-plus-square"></i>مشاهده</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+            <div class="clearfix"></div>
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li><a href="?page={{ page_obj.previous_page_number }}">&#10094;</a></li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% ifequal num page_obj.number %}
+                                    <li class="active"><a href="?page={{ num }}">{{ num }}</a></li>
+                                {% else %}
+                                    <li><a href="?page={{ num }}"> {{ num }}</a></li>
+                                {% endifequal %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li><a href="?page={{ page_obj.next_page_number }}">&#10095;</a></li>
+                            {% endif %}
+                        </ul>
+                    </div><!--features_items-->
+                </div>
+
+                {% include 'product/component-category.html' %}
+
+
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'account/base_profile/base.html' %}
+{% load static %}
+
+
+{% block profile %}
+    <div class="content-wrapper" style="min-height: 1231.06px;">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>پیام ها</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item active">contact</li>
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        </ol>
+                    </div>
+                </div>
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md">
+                        <div class="card">
+                            <div class="card-header p-2">
+                                <ul class="nav nav-pills">
+                                    <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Contact</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <div class="tab-content">
+                                    <div class="active tab-pane" id="activity">
+                                        {% for c in contact %}
+                                            <div class="post clearfix">
+                                                <div class="user-block">
+                                                    {% if c.user.profile.avatar_image %}
+                                                        <img class="img-circle img-bordered-sm"
+                                                         src="{{ c.user.profile.avatar_image.url }}"
+                                                         alt="user image">
+                                                    {% endif %}
+                                                    <span class="username">
+                                                        <a href="#">{{ c.user.name }}</a>
+                                                        <a href="#" class="float-right btn-tool"><i
+                                                                class="fas fa-times"></i></a>
+                                                    </span>
+                                                    <span class="description">{{ c.create_on }}</span>
+                                                </div>
+                                                <p>
+                                                    {{ c.message }}
+                                                </p>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

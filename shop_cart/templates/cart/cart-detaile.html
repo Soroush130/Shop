@@ -1,0 +1,236 @@
+{% extends 'shared/_MainLayout.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block title %}
+سبد خرید
+{% endblock %}
+
+
+{% block content %}
+    <section id="cart_items">
+        <div class="container">
+            <div class="breadcrumbs">
+                <ol class="breadcrumb">
+                    <li><a href="#">خانـه</a></li>
+                    <li class="active">پرداخت</li>
+                </ol>
+            </div><!--/breadcrums-->
+
+
+            <div class="review-payment">
+                <h2>مشاهـده و پرداخت</h2>
+            </div>
+
+            <div class="table-responsive cart_info">
+                <table class="table table-condensed">
+                    <thead>
+                    <tr class="cart_menu">
+                        <td class="image">کـالا</td>
+                        <td class="description">توضیحات</td>
+                        <td class="price">قیمت</td>
+                        <td class="quantity">تعـداد</td>
+                        <td class="total">مجمـوع</td>
+                        <td>حذف</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for cart in carts %}
+                        <tr>
+                            <td class="cart_product">
+                                <a href="/products/product_detail/{{ cart.product.id }}"><img
+                                        src="{{ cart.product.image.url }}" alt=""
+                                        style="width: 110px;height: 110px"></a>
+                            </td>
+                            <td class="cart_description">
+                                <h4>
+                                    <a href="/products/product_detail/{{ cart.product.id }}">{{ cart.product.title }}</a>
+                                </h4>
+                                <p>شناسـه : {{ cart.product.id }}</p>
+                            </td>
+                            <td class="cart_price">
+                                <p>{{ cart.product.price|intcomma }} ريال</p>
+                            </td>
+                            <td class="cart_quantity">
+                                <a href="/cart/remove-single/{{ cart.id }}"><i class="fa fa-minus"></i></a>
+                                <p>{{ cart.quantity }}</p>
+                                <a href="/cart/add-single/{{ cart.id }}"><i class="fa fa-plus"></i></a>
+                            </td>
+                            <td class="cart_total">
+                                <p class="cart_total_price">{{ cart.get_total_item_price|intcomma }} ريال</p>
+                            </td>
+                            <td class="cart_delete">
+                                <a class="cart_quantity_delete" href="/cart/remove/{{ cart.id }}"><i
+                                        class="fa fa-times"></i></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr style="border-top: 2px solid #FD9A15">
+                        <td colspan="4">&nbsp;</td>
+                        <td colspan="2">
+                            <table class="table table-condensed total-result" style="font-size: 13pt">
+                                <tbody>
+                                <tr>
+                                    <td>مجمـوع سبـد خریـد</td>
+                                    <td>{{ total|intcomma }} ريال</td>
+                                </tr>
+                                <tr>
+                                    <td>مالیـات (9%)</td>
+                                    <td>{{ taxation|intcomma }} ريال</td>
+                                </tr>
+                                <tr class="shipping-cost">
+                                    <td>هزینـه حمل و نقـل</td>
+                                    <td>رایـگان</td>
+                                </tr>
+                                <tr>
+                                    <td>مجمـوع</td>
+                                    <td><span>{{ total_carts|intcomma }} ريال</span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {% if carts %}
+                <div class="step-one">
+                    <h2 class="heading">اطلاعات حمل</h2>
+                </div>
+
+                <div class="shopper-informations">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="shopper-info">
+                            </div>
+                        </div>
+                        <div class="col-sm-9 clearfix">
+                            <div class="bill-to">
+                                <div class="form-one">
+                                    <form action="/cart/create" method="POST">
+                                        {% csrf_token %}
+                                        <input type="text" name="l_name" value="{{ request.user.profile.f_name }}"
+                                               class="important-field" placeholder="* نـام">
+                                        <input type="text" name="f_name" value="{{ request.user.profile.l_name }}"
+                                               class="important-field" placeholder="* نام خانوادگـی">
+                                        <input type="email" name="email" value="{{ request.user.email }}"
+                                               placeholder="* ایمیـل" class="important-field">
+                                        <input type="number" name="phone" value="{{ request.user.profile.phone }}"
+                                               placeholder="شماره تلفن">
+                                        <input type="text" name="address" value="{{ request.user.profile.address }}"
+                                               class="important-field" placeholder="* آدرس 1">
+                                        <input type="text" name="address_2" placeholder="آدرس 2">
+                                        <div class="payment-options">
+                                            <button type="submit" class="btn-primary" style="margin: 45px 85px">ثبت و
+                                                ادامه
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
+
+
+
+
+
+    {#    <section id="cart_items">#}
+    {#        <div class="container">#}
+    {#            <div class="breadcrumbs">#}
+    {#                <ol class="breadcrumb">#}
+    {#                    <li><a href="#">خانـه</a></li>#}
+    {#                    <li class="active">پرداخت</li>#}
+    {#                </ol>#}
+    {#            </div><!--/breadcrums-->#}
+    {#            <div class="table-responsive cart_info">#}
+    {#                <table class="table table-condensed">#}
+    {#                    <thead>#}
+    {#                    <tr class="cart_menu">#}
+    {#                        <td class="image">کـالا</td>#}
+    {#                        <td class="description"></td>#}
+    {#                        <td class="price">قیمت</td>#}
+    {#                        <td class="quantity">تعـداد</td>#}
+    {#                        <td class="total">مجمـوع</td>#}
+    {#                        <td></td>#}
+    {#                    </tr>#}
+    {#                    </thead>#}
+    {#                    <tbody>#}
+    {#                    {% for cart in carts %}#}
+    {#                        <tr>#}
+    {#                            <td class="cart_product">#}
+    {#                                <a href=""><img src="{{ cart.product.image.url }}" alt="{{ cart.product.title }}"#}
+    {#                                                style="width: 110px;height: 110px"></a>#}
+    {#                            </td>#}
+    {#                            <td class="cart_description">#}
+    {#                                <h4><a href="">{{ cart.product.title }}</a></h4>#}
+    {#                                <p>شناسـه : {{ cart.product.id }}</p>#}
+    {#                            </td>#}
+    {#                            <td class="cart_price">#}
+    {#                                <p>{{ cart.product.price|intcomma }} ريال</p>#}
+    {#                            </td>#}
+    {#                            <td class="cart_quantity" style="font-size: 15px">#}
+    {#                                {{ cart.quantity }}#}
+    {#                            </td>#}
+    {#                            <td class="cart_total">#}
+    {#                                <p class="cart_total_price">{{ cart.get_total_item_price|intcomma }} ريال</p>#}
+    {#                            </td>#}
+    {#                            <td class="cart_delete">#}
+    {#                                <a class="cart_quantity_delete" href="/cart/remove/{{ cart.id }}"><i#}
+    {#                                        class="fa fa-times"></i></a>#}
+    {#                            </td>#}
+    {#                        </tr>#}
+    {#                    {% endfor %}#}
+    {#                    </tbody>#}
+    {#                </table>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </section>#}
+    {##}
+    {#    <section id="do_action">#}
+    {#        <div class="container">#}
+    {#            <div class="heading">#}
+    {#                <h3>نهایی کردن سفارش یا ادامه خریـد ؟! </h3>#}
+    {#                <p>در صورتیکـه کوپن خریـد و یا کد تخفیف داریـد میتوانید از آن استفاده نمایید | با استفاده از بخش مربوطه#}
+    {#                    هزینه حمل و نقل خود را محاسبـه نمایید</p>#}
+    {#            </div>#}
+    {#            <div class="row">#}
+    {#                <div class="col-sm-6">#}
+    {#                    <div class="chose_area">#}
+    {#                        <ul class="user_option">#}
+    {#                            <li>#}
+    {#                                <h3>استفاده از کوپـن خریـد / کارت تخفیـف :</h3>#}
+    {#                            </li>#}
+    {#                            <li class="single_field zip-field">#}
+    {#                                <input type="text" placeholder="کد تخفیف خود را وارد نمایید ...">#}
+    {#                            </li>#}
+    {#                            <li>#}
+    {#                                <a class="btn btn-default update" href="">بررسی و اعمال</a>#}
+    {#                            </li>#}
+    {#                        </ul>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#                <div class="col-sm-6">#}
+    {#                    <div class="total_area">#}
+    {#                        <ul>#}
+    {#                            <li>مجمـوع سبـد خریـد <span>{{ total|intcomma }} ريال</span></li>#}
+    {#                            <li>مالیـات (9%) <span>{{ taxation|intcomma }} ريال</span></li>#}
+    {#                            <li>هزینـه حمل و نقـل <span>رایـگان</span></li>#}
+    {#                            <li>مجمـوع <span>{{ total_carts|intcomma }} ريال</span></li>#}
+    {#                        </ul>#}
+    {#                        <a class="btn btn-default update" href="shop.html">به روز رسانی سبـد خریـد </a>#}
+    {#                        <a class="btn btn-default check_out" href="checkout.html">پرداخت</a>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </section>#}
+{% endblock %}

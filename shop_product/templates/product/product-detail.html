@@ -1,0 +1,386 @@
+{% extends 'shared/_MainLayout.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block title %}
+محصول {{ product.title }}
+{% endblock %}
+
+{% block content %}
+    <style>
+
+        .rating {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .rating > input {
+            display: none
+        }
+
+        .rating > label {
+            position: relative;
+            width: 19px;
+            font-size: 25px;
+            color: goldenrod;
+            cursor: pointer
+        }
+
+        .rating > label::before {
+            content: "\2605";
+            position: absolute;
+            opacity: 0
+        }
+
+        .rating > label:hover:before,
+        .rating > label:hover ~ label:before {
+            opacity: 1 !important
+        }
+
+        .rating > input:checked ~ label:before {
+            opacity: 1
+        }
+
+        .rating:hover > input:checked ~ label:before {
+            opacity: 0.4
+        }
+    </style>
+    <section>
+        <div class="container">
+            <div class="row">
+
+                <div class="col-sm-9 padding-right">
+                    <div class="product-details"><!--product-details-->
+                        <div class="col-sm-5">
+                            <div class="view-product">
+                                <img src="{{ product.image.url }}" alt="">
+                                <h3>بزرگنمایـی</h3>
+                            </div>
+                            <div id="similar-product" class="carousel slide" data-ride="carousel">
+
+                                <!-- Wrapper for slides -->
+                                <div class="carousel-inner">
+                                    {% for product_image in list_gallery %}
+                                        <div class="item {{ forloop.first|yesno:'active,' }}">
+                                            {% for p in product_image %}
+                                                <a href=""><img src="{{ p.image.url }}"
+                                                                alt="{{ p.title }}"
+                                                                style="width: 70px;height: 70px;"></a>
+                                            {% endfor %}
+
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Controls -->
+                                <a class="right item-control" href="#similar-product" data-slide="next">
+                                    <i class="fa fa-angle-right"></i>
+                                </a>
+                                <a class="left item-control" href="#similar-product" data-slide="prev">
+                                    <i class="fa fa-angle-left"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-7">
+                            <div class="product-information"><!--/product-information-->
+                                {% if is_new_product %}
+                                    <img src="{% static 'images/product-details/new.png' %}" class="newarrival" alt="">
+                                {% endif %}
+                                <div>
+                                    <h2>{{ product.title }}</h2>
+                                    <p>شناسـه : {{ product.id }}</p>
+                                    {% if is_favourite %}
+                                        <a href="/products/favourite/{{ product.id }}"><i
+                                                class="fa fa-heart"
+                                                style="color: orange; font-size: 24px "></i></a>
+                                    {% else %}
+                                        <a href="/products/favourite/{{ product.id }}"><i
+                                                class="fa fa-heart-o"
+                                                style="color: orange; font-size: 24px "></i></a>
+                                    {% endif %}
+                                </div>
+                                <div>
+									<span>
+										<span>قیمت : {{ product.price|intcomma }} ريال</span>
+									</span>
+                                    <span>
+                                        <form action="/cart/{{ product.id }}" method="POST">
+                                            {% csrf_token %}
+    										<label>تعداد :</label>
+									    	<input type="number" name="quantity" min="0" value="0" class="search_box">
+										    <button type="submit" class="btn btn-fefault cart">
+											    <i class="fa fa-shopping-cart"></i>
+										    	افـزودن به سبـد خریـد
+									    	</button>
+                                        </form>
+									</span>
+                                </div>
+                                <div>
+                                    {% if product.inventory %}
+                                        <p><b>موجـودی :</b> در انبـار موجود می باشد  ({{ product.count }})</p>
+                                    {% else %}
+                                        <p><b>موجـودی :</b> در انبـار موجود نمی باشد</p>
+                                    {% endif %}
+
+                                    <p><b>شرایـط :</b> جدیـد</p>
+                                    <p><b>برنـد :</b> {{ product.brand }} </p>
+                                </div>
+                                <span class="socials-share share">
+									<ul>
+										<a href="#">
+											<li>
+												<label>بلـه</label>
+												<img src="{% static 'images/product-details/Bale.png' %}">
+											</li>
+										</a>
+										<a href="#">
+											<li>
+												<label>سـروش</label>
+												<img src="{% static 'images/product-details/Soroush.png' %}">
+											</li>
+										</a>
+										<a href="">
+											<li>
+												<label>اینستاگرام</label>
+												<img src="{% static 'images/product-details/Instagram.png' %}">
+											</li>
+										</a>
+
+									</ul>
+								</span>
+
+                            </div><!--/product-information-->
+                        </div>
+                    </div><!--/product-details-->
+
+                    <div class="category-tab shop-details-tab"><!--category-tab-->
+                        <div class="col-sm-12">
+                            <ul class="nav nav-tabs">
+                                <li><a href="#details" data-toggle="tab">جزئیات</a></li>
+                                <li><a href="#companyprofile" data-toggle="tab">نمودار تغییرات قیمت</a></li>
+                                <li><a href="#tag" data-toggle="tab">برچسب</a></li>
+                                <li class="active"><a href="#reviews" data-toggle="tab">نظرات
+                                    ({{ product.co_pr.count}})</a></li>
+                            </ul>
+                        </div>
+                        <div class="tab-content">
+                            <div class="tab-pane fade" id="details">
+                                <div class="col-sm-12">
+                                    <p>{{ product.body|truncatechars:300 }}</p>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="companyprofile">
+                                {% block script %}
+                                    <script>
+                                        var ctx = document.getElementById('myChart').getContext('2d');
+                                        var myChart = new Chart(ctx, {
+                                            type: 'line',
+                                            data: {
+                                                labels: [
+                                                    {% for date in update_price %}
+                                                        '{{ date.update.date }}',
+                                                    {% endfor %}
+                                                ],
+                                                datasets: [{
+                                                    label: '# of Votes',
+                                                    data: [
+                                                        {% for price in update_price %}
+                                                            {{ price.price|intcomma }},
+                                                        {% endfor %}
+                                                    ],
+                                                    backgroundColor: [
+                                                        'rgba(255, 99, 132, 0.5)',
+                                                        'rgba(54, 162, 235, 0.5)',
+                                                        'rgba(255, 206, 86, 0.5)',
+                                                        'rgba(75, 192, 192, 0.5)',
+                                                        'rgba(153, 102, 255, 0.5)',
+                                                        'rgba(255, 159, 64, 0.5)'
+                                                    ],
+                                                    borderColor: [
+                                                        'rgba(255, 99, 132, 1)',
+                                                        'rgba(54, 162, 235, 1)',
+                                                        'rgba(255, 206, 86, 1)',
+                                                        'rgba(75, 192, 192, 1)',
+                                                        'rgba(153, 102, 255, 1)',
+                                                        'rgba(255, 159, 64, 1)'
+                                                    ],
+                                                    borderWidth: 1
+                                                }]
+                                            },
+                                            options: {
+                                                scales: {
+                                                    y: {
+                                                        beginAtZero: true
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    </script>
+                                {% endblock %}
+                                <canvas id="myChart" width="600" height="300"></canvas>
+                            </div>
+
+                            <div class="tab-pane fade" id="tag">
+                                <div class="col-sm-3">
+                                    <div class="product-image-wrapper">
+                                        <div class="single-products">
+                                            <div class="productinfo text-center">
+                                                <img src="{% static 'images/home/gallery.jpg' %}" alt="">
+                                                <h2>1.250.000 ريال</h2>
+                                                <p>توضیحات کوتاه محصول</p>
+                                                <button type="button" class="btn btn-default add-to-cart"><i
+                                                        class="fa fa-shopping-cart"></i>افزودن به سبـد خریـد
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="product-image-wrapper">
+                                        <div class="single-products">
+                                            <div class="productinfo text-center">
+                                                <img src="{% static 'images/home/gallery.jpg' %}" alt="">
+                                                <h2>1.250.000 ريال</h2>
+                                                <p>توضیحات کوتاه محصول</p>
+                                                <button type="button" class="btn btn-default add-to-cart"><i
+                                                        class="fa fa-shopping-cart"></i>افزودن به سبـد خریـد
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="product-image-wrapper">
+                                        <div class="single-products">
+                                            <div class="productinfo text-center">
+                                                <img src="{% static 'images/home/gallery.jpg' %}" alt="">
+                                                <h2>1.250.000 ريال</h2>
+                                                <p>توضیحات کوتاه محصول</p>
+                                                <button type="button" class="btn btn-default add-to-cart"><i
+                                                        class="fa fa-shopping-cart"></i>افزودن به سبـد خریـد
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="product-image-wrapper">
+                                        <div class="single-products">
+                                            <div class="productinfo text-center">
+                                                <img src="{% static 'images/home/gallery.jpg' %}" alt="">
+                                                <h2>1.250.000 ريال</h2>
+                                                <p>توضیحات کوتاه محصول</p>
+                                                <button type="button" class="btn btn-default add-to-cart"><i
+                                                        class="fa fa-shopping-cart"></i>افزودن به سبـد خریـد
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade active in" id="reviews">
+                                <div class="col-sm-12">
+                                    {% for comment in comments %}
+                                        <ul>
+                                            <li><a href=""><i class="fa fa-user"></i>{{ comment.user.name }}</a></li>
+                                            <li><a href=""><i class="fa fa-clock-o"></i>{{ comment.create_on.time }}</a>
+                                            </li>
+                                            <li><a href=""><i class="fa fa-calendar-o"></i>{{ comment.create_on.date }}
+                                            </a></li>
+                                            <li style="display: flex;flex-direction: row">
+                                                <a href=""><i
+                                                        class="fa fa-star{% if comment.rate < 1 %}-o empty{% endif %}"></i></a>
+                                                <a href=""><i
+                                                        class="fa fa-star{% if comment.rate < 2 %}-o empty{% endif %}"></i></a>
+                                                <a href=""><i
+                                                        class="fa fa-star{% if comment.rate < 3 %}-o empty{% endif %}"></i></a>
+                                                <a href=""><i
+                                                        class="fa fa-star{% if comment.rate < 4 %}-o empty{% endif %}"></i></a>
+                                                <a href=""><i
+                                                        class="fa fa-star{% if comment.rate < 5 %}-o empty{% endif %}"></i></a>
+                                            </li>
+                                        </ul>
+                                        <p>{{ comment.comment }}</p>
+                                    {% endfor %}
+                                    <hr>
+                                    <p><b>نظـر خود را بنویسیـد</b></p>
+                                    <form action="/products/{{ product.id }}" method="POST">
+                                        {% csrf_token %}
+                                        <textarea type="text" name="comment"></textarea>
+                                        <b>امتیاز : </b> <span class="rating"
+                                                               style="display: flex; flex-direction: row">
+											<input type="radio" name="rate" value="5" id="5"
+                                                   style="display: none"><label
+                                            for="5">&star;</label>
+                                            <input type="radio" name="rate" value="4" id="4"
+                                                   style="display: none"><label
+                                            for="4">&star;</label>
+                                            <input type="radio" name="rate" value="3" id="3"
+                                                   style="display: none"><label
+                                            for="3">&star;</label>
+                                            <input type="radio" name="rate" value="2" id="2"
+                                                   style="display: none"><label
+                                            for="2">&star;</label>
+                                            <input type="radio" name="rate" value="1" id="1"
+                                                   style="display: none"><label
+                                            for="1">&star;</label>
+										</span>
+                                        <button type="submit" class="btn btn-default pull-left">
+                                            ارسـال
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div><!--/category-tab-->
+
+                    <div class="recommended_items"><!--recommended_items-->
+                        <h2 class="title text-center">محصولات پیشنهادی</h2>
+
+                        <div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner">
+                                {% for foo in list_suggested_product %}
+                                    <div class="item {{ forloop.first|yesno:'active,' }}">
+                                        {% for fo in foo %}
+                                            <div class="col-sm-4">
+                                                <div class="product-image-wrapper">
+                                                    <div class="single-products">
+                                                        <div class="productinfo text-center">
+                                                            <img src="{{ fo.image.url }}" alt="">
+                                                            <h2>{{ fo.price|intcomma }} ريال</h2>
+                                                            <p>{{ fo.title }}</p>
+                                                            <button type="button" class="btn btn-default add-to-cart"><i
+                                                                    class="fa fa-shopping-cart"></i>افزودن به سبـد خریـد
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <a class="left recommended-item-control" href="#recommended-item-carousel"
+                               data-slide="prev">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a class="right recommended-item-control" href="#recommended-item-carousel"
+                               data-slide="next">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </div>
+                    </div><!--/recommended_items-->
+
+                </div>
+
+                {% include 'product/component-category.html' %}
+
+            </div>
+        </div>
+    </section>
+{% endblock %}

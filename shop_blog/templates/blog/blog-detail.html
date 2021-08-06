@@ -1,0 +1,220 @@
+{% extends 'shared/_MainLayout.html' %}
+{% load static %}
+
+
+{% block title %}
+{{ blog.title }} خبر
+{% endblock %}
+{% block content %}
+    <style>
+
+        .rating {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .rating > input {
+            display: none
+        }
+
+        .rating > label {
+            position: relative;
+            width: 19px;
+            font-size: 25px;
+            color: goldenrod;
+            cursor: pointer
+        }
+
+        .rating > label::before {
+            content: "\2605";
+            position: absolute;
+            opacity: 0
+        }
+
+        .rating > label:hover:before,
+        .rating > label:hover ~ label:before {
+            opacity: 1 !important
+        }
+
+        .rating > input:checked ~ label:before {
+            opacity: 1
+        }
+
+        .rating:hover > input:checked ~ label:before {
+            opacity: 0.4
+        }
+    </style>
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="blog-post-area">
+                        <h2 class="title text-center">{{ blog.title }}</h2>
+                        <div class="single-blog-post">
+                            <div class="post-meta">
+                                <ul>
+                                    <li><i class="fa fa-user"></i>{{ blog.author.name }}</li>
+                                    <li><i class="fa fa-clock-o"></i>{{ blog.create_on.time }}</li>
+                                    <li><i class="fa fa-calendar"></i>{{ blog.create_on.date }}</li>
+                                </ul>
+
+                                <form action="/blog/rate/{{ blog.id }}" method="POST">
+                                    {% csrf_token %}
+                                    <span class="rating"
+                                          style="display: flex; flex-direction: row">
+                                                    <input type="radio" name="rate" value="5" id="5"
+                                                           style="display: none" onsubmit="this.value"><label
+                                            for="5">&star;</label>
+                                                    <input type="radio" name="rate" value="4" id="4"
+                                                           style="display: none" onchange="this.form.submit();"><label
+                                            for="4">&star;</label>
+                                                    <input type="radio" name="rate" value="3" id="3"
+                                                           style="display: none" onchange="this.form.submit();"><label
+                                            for="3">&star;</label>
+                                                    <input type="radio" name="rate" value="2" id="2"
+                                                           style="display: none" onchange="this.form.submit();"><label
+                                            for="2">&star;</label>
+                                                    <input type="radio" name="rate" value="1" id="1"
+                                                           style="display: none" onchange="this.form.submit();"><label
+                                            for="1">&star;</label>
+                                                </span>
+                                </form>
+
+                            </div>
+                            <a href="">
+                                <img src="{{ blog.image.url }}" alt="">
+                            </a>
+                            <p>{{ blog.get_first_half_text }}</p>
+                            <p>{{ blog.get_second_half_text }}</p>
+                            <div class="pager-area">
+                                <ul class="pager pull-left">
+                                    <li><a href="/blog/blog-detail/{{ prev }}">قبلی</a></li>
+                                    <li><a href="/blog/blog-detail/{{ next }}">بعـدی</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div><!--/blog-post-area-->
+
+                    <div class="rating-area">
+                        <ul class="ratings">
+                            <li class="rate-this">به این مطلب نظر دهیـد :</li>
+
+                            <li class="color">( {{ comment.count }} نظـر )</li>
+                        </ul>
+                        <ul class="tag">
+                            <li>برچسب :</li>
+                            <li><a class="color" href="">برچسب 1 <span>/</span></a></li>
+                            <li><a class="color" href="">برچسب 2 <span>/</span></a></li>
+                            <li><a class="color" href="">برچسب 3</a></li>
+                        </ul>
+                    </div><!--/rating-area-->
+
+                    <div class="socials-share">
+                        <a href=""><img src="images/blog/socials.png" alt=""></a>
+                    </div><!--/socials-share-->
+
+                    <div class="response-area">
+                        <ul class="media-list">
+                            {% for com in comment %}
+                                {% if not com.reply %}
+                                    <li class="media">
+                                        <a class="pull-right" href="#">
+                                            {% if com.user.profile.avatar_image %}
+                                                <img class="media-object" src="{{ com.user.profile.avatar_image.url }}"
+                                                     alt="">
+                                            {% else %}
+                                                <img class="media-object" src="{% static 'images/blog/Customer.jpg' %}"
+                                                     alt="">
+                                            {% endif %}
+                                        </a>
+                                        <div class="media-body">
+                                            <ul class="sinlge-post-meta">
+                                                <li><i class="fa fa-user"></i>{{ com.user.name }}</li>
+                                                <li><i class="fa fa-clock-o"></i>{{ com.create_on.time }}</li>
+                                                <li><i class="fa fa-calendar"></i>{{ com.create_on.date }}</li>
+                                            </ul>
+                                            <p>{{ com.comment }}</p>
+                                            <button class="btn btn-sm btn-primary" type="button" data-toggle="collapse"
+                                                    data-target="#replyBox{{ com.id }}" aria-expanded="false">
+                                                پاسخ
+                                            </button>
+                                            <div class="collapse" id="replyBox{{ com.id }}">
+                                                <div class="replay-box">
+                                                    <div class="row">
+                                                        <form action="/blog/reply_comment/{{ blog.id }}/{{ com.id }}"
+                                                              method="POST">
+                                                            {% csrf_token %}
+                                                            <div class="col-sm">
+                                                                <div class="text-area">
+                                                                    <div class="blank-arrow">
+                                                                        <label>متن پیام</label>
+                                                                    </div>
+                                                                    <span>*</span>
+                                                                    <textarea name="comment" rows="10"
+                                                                              style="border: 2px solid;"></textarea>
+                                                                    <button type="submit" class="btn btn-primary">ارسـال
+                                                                        نظـر
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div><!--/Repaly Box-->
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                                {% for reply in com.reply_comment.all %}
+                                    <li class="media second-media">
+                                        <a class="pull-right" href="#">
+                                            {% if reply.user.profile.avatar_image %}
+                                                <img class="media-object"
+                                                     src="{{ reply.user.profile.avatar_image.url }}"
+                                                     alt="">
+                                            {% else %}
+                                                <img class="media-object"
+                                                     src="{% static 'images/blog/Customer.jpg' %}"
+                                                     alt="">
+                                            {% endif %}
+                                        </a>
+                                        <div class="media-body">
+                                            <ul class="sinlge-post-meta">
+                                                <li><i class="fa fa-user"></i>{{ reply.user.name }}</li>
+                                                <li><i class="fa fa-clock-o"></i>{{ reply.create_on.time }}</li>
+                                                <li><i class="fa fa-calendar"></i>{{ reply.create_on.date }}</li>
+                                            </ul>
+                                            <p>{{ reply.comment }}</p>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div><!--/Response-area-->
+
+
+                    <div class="replay-box">
+                        <h2>نظر دهید</h2>
+                        <div class="row">
+                            <form action="/blog/comment/{{ blog.id }}" method="POST">
+                                {% csrf_token %}
+                                <div class="col-sm">
+                                    <div class="text-area">
+                                        <div class="blank-arrow">
+                                            <label>متن پیام</label>
+                                        </div>
+                                        <span>*</span>
+                                        <textarea name="comment" rows="10" style="border: 2px solid;"></textarea>
+                                        <button type="submit" class="btn btn-primary">ارسـال نظـر</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div><!--/Repaly Box-->
+                </div>
+
+                {% include 'product/component-category.html' %}
+
+            </div>
+        </div>
+    </section>
+{% endblock %}

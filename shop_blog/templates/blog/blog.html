@@ -1,0 +1,60 @@
+{% extends 'shared/_MainLayout.html' %}
+{% load static %}
+
+{% block title %}
+اخبار
+{% endblock %}
+
+{% block content %}
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="blog-post-area">
+                        <h2 class="title text-center">آخریـن اخبـار</h2>
+                        {% for blog in page_obj %}
+                            <div class="single-blog-post">
+                                <h3>{{ blog.title }}</h3>
+                                <div class="post-meta">
+                                    <ul>
+                                        <li><i class="fa fa-user"></i> کاربـر {{ blog.author.name }}</li>
+                                        <li><i class="fa fa-clock-o"></i> {{ blog.create_on.time }}</li>
+                                        <li><i class="fa fa-calendar"></i>{{ blog.create_on.date }}</li>
+                                    </ul>
+
+                                </div>
+                                <a href="">
+                                    <img src="{{ blog.image.url }}" alt="">
+                                </a>
+                                <p>{{ blog.text|truncatewords:30 }}</p>
+                                <a class="btn btn-primary" href="/blog/blog-detail/{{ blog.id }}">ادامـه مطلب</a>
+                            </div>
+                        {% endfor %}
+
+                        <div class="pagination-area">
+                            <ul class="pagination">
+                              {% if page_obj.has_previous %}
+                                <li><a href="?page={{ page_obj.previous_page_number }}">&#10094;</a></li>
+                            {% endif %}
+                            {% for num in page_obj.paginator.page_range %}
+                                {% ifequal num page_obj.number %}
+                                    <li class="active"><a href="?page={{ num }}">{{ num }}</a></li>
+                                {% else %}
+                                    <li><a href="?page={{ num }}"> {{ num }}</a></li>
+                                {% endifequal %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li><a href="?page={{ page_obj.next_page_number }}">&#10095;</a></li>
+                            {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                {% include 'product/component-category.html' %}
+
+            </div>
+        </div>
+    </section>
+{% endblock %}
